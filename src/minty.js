@@ -410,19 +410,28 @@ class Minty {
     async pin(cidOrURI) {
         const cid = extractCID(cidOrURI)
 
+        console.log(`pin pre configure`)
+
         // Make sure IPFS is set up to use our preferred pinning service.
         await this._configurePinningService()
+
+        console.log(`pin pre isPinned`)
 
         // Check if we've already pinned this CID to avoid a "duplicate pin" error.
         const pinned = await this.isPinned(cid)
         if (pinned) {
+            console.log(`pin is pinned already`)
             return
         }
+
+        console.log(`pin pre add`)
 
         // Ask the remote service to pin the content.
         // Behind the scenes, this will cause the pinning service to connect to our local IPFS node
         // and fetch the data using Bitswap, IPFS's transfer protocol.
-        await this.ipfs.pin.remote.add(cid, { service: config.pinningService.name })
+        const b = await this.ipfs.pin.remote.add(cid, { service: config.pinningService.name })
+
+        console.log(`pin after add result = ${b}`)
     }
 
 

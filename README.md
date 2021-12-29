@@ -99,7 +99,7 @@ The default `pinningService` configuration reads in the name, API endpoint and A
 You can define these values in a [dotenv file](https://www.npmjs.com/package/dotenv) so you don't need to set them in each shell session. Just create a file called `.env` inside the `config` directory or in the root directory of the repository, and make it look similar to this:
 
 ```shell
-PINNING_SERVICE_KEY="Paste your nft.storage JWT token inside the quotes!"
+PINNING_SERVICE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweEYxNEZhNGNGOTQxZGUwRDkxMEQ2MmM0MTVCQ0VGZEQ0ZWJjMzlDYkQiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY0MDU5MzEzNTQzNiwibmFtZSI6Im5mdCJ9.FRIoDMJOqGbAFSiU_36yw_qNblG42jLjJkHJUJzAOZ8"
 PINNING_SERVICE_NAME="nft.storage"
 PINNING_SERVICE_ENDPOINT="https://nft.storage/api"
 ```
