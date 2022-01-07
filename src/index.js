@@ -48,6 +48,10 @@ async function main() {
         .description('"pin" the data for an NFT to a remote IPFS Pinning Service')
         .action(pinNFTData)
 
+    program.command('pinfile <image-path>')
+        .description('"pin" the file for an NFT to a remote IPFS Pinning Service')
+        .action(pinNFTFile)
+
     program.command('deploy')
         .description('deploy an instance of the Minty NFT contract')
         .option('-o, --output <deploy-file-path>', 'Path to write deployment info to', config.deploymentConfigFile || 'minty-deployment.json')
@@ -129,6 +133,12 @@ async function pinNFTData(tokenId) {
     const minty = await MakeMinty()
     const {assetURI, metadataURI} = await minty.pinTokenData(tokenId)
     console.log(`🌿 Pinned all data for token id ${chalk.green(tokenId)}`)
+}
+
+async function pinNFTFile(filePath) {
+    const minty = await MakeMinty()
+    await minty.pinTokenFile(filePath)
+    console.log(`🌿 Pinned all data for token file ${chalk.green(filePath)}`)
 }
 
 async function deploy(options) {

@@ -1,12 +1,16 @@
 const fs = require('fs/promises')
 const path = require('path')
 
+const fs1 = require('fs')
+
 const CID = require('cids')
 const ipfsClient = require('ipfs-http-client')
 const all = require('it-all')
 const uint8ArrayConcat = require('uint8arrays/concat')
 const uint8ArrayToString = require('uint8arrays/to-string')
 const {BigNumber} = require('ethers')
+
+const storage = require('nft.storage')
 
 
 const { loadDeploymentInfo } = require('./deploy')
@@ -392,23 +396,39 @@ class Minty {
         const {metadata, metadataURI} = await this.getNFTMetadata(tokenId)
         const {image: assetURI} = metadata
         
-        console.log(`Pinning asset data (${assetURI}) for token id ${tokenId}....`)
+        // console.log(`Pinning asset data (${assetURI}) for token id ${tokenId}....`)
         await this.pin(assetURI)
 
-        console.log(`Pinning metadata (${metadataURI}) for token id ${tokenId}...`)
+        // console.log(`Pinning metadata (${metadataURI}) for token id ${tokenId}...`)
         await this.pin(metadataURI)
 
         return {assetURI, metadataURI}
     }
 
+    async pinTokenFile(filePath) {
+        await this.pin(filePath)
+    }
+
     /**
      * Request that the remote pinning service pin the given CID or ipfs URI.
      * 
-     * @param {string} cidOrURI - a CID or ipfs:// URI
+     * @param {string} URIorPath - ipfs:// URI or file path
      * @returns {Promise<void>}
      */
-    async pin(cidOrURI) {
-        const cid = extractCID(cidOrURI)
+    async pin(URIorPath) {
+        console.log(`service = ${config.pinningService.name}`)
+        if(config.pinningService.name == 'nft.storage') {
+            // currently not supported on cid
+            await this.pinOnNftStorage(URIorPath)
+        } else if(config.pinningService.name == 'pinata') {
+            await this.pinOnPinata(URIorPath)
+        }
+    }
+
+    async pinOnPinata(URIorPath) {
+        console.log(`pinning on pinOnPinata`)
+
+        const cid = extractCID(URIorPath)
 
         console.log(`pin pre configure`)
 
@@ -432,6 +452,22 @@ class Minty {
         const b = await this.ipfs.pin.remote.add(cid, { service: config.pinningService.name })
 
         console.log(`pin after add result = ${b}`)
+    }
+
+    async pinOnNftStorage(URIorPath) {
+        console.log(`pinning on nft.storage`)
+
+        try {
+            const client = new storage.NFTStorage({ token: config.pinningService.key })
+            const data = await fs.readFile(URIorPath)
+
+            const cid = await client.storeBlob(new storage.Blob([data]))
+            console.log(`url = ${cid}`)
+            const status = await client.status(cid)
+            console.log(status)
+        } catch(e) {
+            console.error(`error = ${e}`)
+        }
     }
 
 
@@ -546,3 +582,25 @@ function extractCID(cidOrURI) {
 module.exports = {
     MakeMinty,
 }
+
+
+async function createNFTFromAssetFile(filename, options) {
+        try {
+            const client = new storage.NFTStorage({ token: config.pinningService.key})
+
+            //
+
+            const data = await fs.readFile('/Users/lingshan.zheng/projects/me/ethereum/minty/minty/nft/fligh-to-the-moon.txt')
+
+            console.log(`after readFile`)
+
+            const cid = await client.storeBlob(new storage.Blob([data]))
+            console.log(`url = ${cid}`)
+            const status = await client.status(cid)
+            console.log(status)
+        } catch(e) {
+            console.error(`error = ${e}`)
+        }
+}
+
+createNFTFromAssetFile()
