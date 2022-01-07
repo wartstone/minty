@@ -4,21 +4,25 @@ const {F_OK} = require('fs')
 const inquirer = require('inquirer')
 const {BigNumber} = require('ethers')
 const config = require('getconfig')
+const hre = require("hardhat");
+
 
 const CONTRACT_NAME = "Minty"
 
 async function deployContract(name, symbol) {
-    const hardhat = require('hardhat')
-    const network = hardhat.network.name
+    // const hardhat = require('hardhat')
+    const network = hre.network.name
+
 
     console.log(`deploying contract for token ${name} (${symbol}) to network "${network}"...`)
-    const Minty = await hardhat.ethers.getContractFactory(CONTRACT_NAME)
+    const Minty = await hre.ethers.getContractFactory("Minty");
+    // const Minty = await hardhat.ethers.getContractFactory(CONTRACT_NAME)
     const minty = await Minty.deploy(name, symbol)
 
     await minty.deployed()
     console.log(`deployed contract for token ${name} (${symbol}) to ${minty.address} (network: ${network})`);
 
-    return deploymentInfo(hardhat, minty)
+    return deploymentInfo(hre, minty)
 }
 
 function deploymentInfo(hardhat, minty) {

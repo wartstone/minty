@@ -603,4 +603,4 @@ async function createNFTFromAssetFile(filename, options) {
         }
 }
 
-createNFTFromAssetFile()
+// createNFTFromAssetFile()
